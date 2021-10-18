@@ -1,0 +1,5 @@
+GET http://localhost:6001/ HTTP/1.1
+
+###
+
+GET http://localhost:6001/?q1=a&q2=b&q3=c
