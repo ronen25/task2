@@ -1,7 +1,7 @@
 syntax = "proto3";
 
-service QueryPrinting {
-    rpc PrintQueryParameters (PrintQueryParametersRequest) returns (PrintQueryParametersResponse);
+service PrintQueryParameters {
+    rpc PrintParameters (PrintQueryParametersRequest) returns (PrintQueryParametersResponse);
 }
 
 message PrintQueryParametersRequest {
