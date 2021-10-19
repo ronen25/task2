@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+service QueryPrinting {
+    rpc PrintQueryParameters (PrintQueryParametersRequest) returns (PrintQueryParametersResponse);
+}
+
+message PrintQueryParametersRequest {
+    string query = 1;
+}
+
+message PrintQueryParametersResponse {
+    string param1 = 1;
+    string param2 = 2;
+    string param3 = 3;
+}

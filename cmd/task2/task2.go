@@ -17,7 +17,6 @@ func main() {
 		log.Fatalln("Error: Environment variable `SERVER_PORT` is missing")
 	}
 
-	// Create service
 	service := service.NewService()
 
 	// Initialize router
