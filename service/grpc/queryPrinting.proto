@@ -1,14 +1,14 @@
 syntax = "proto3";
 
 service PrintQueryParameters {
-    rpc PrintParameters (PrintQueryParametersRequest) returns (PrintQueryParametersResponse);
+    rpc PrintParameters (Request) returns (Response);
 }
 
-message PrintQueryParametersRequest {
+message Request {
     string query = 1;
 }
 
-message PrintQueryParametersResponse {
+message Response {
     string param1 = 1;
     string param2 = 2;
     string param3 = 3;
