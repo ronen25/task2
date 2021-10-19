@@ -15,5 +15,5 @@
 # vendor/
 
 # Generated artifacts
-task2
+./task2
 service/grpc/*.pb.go
