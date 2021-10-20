@@ -16,4 +16,4 @@
 
 # Generated artifacts
 ./task2
-service/grpc/*.pb.go
+service/protos/queryPrinter*pb.go
