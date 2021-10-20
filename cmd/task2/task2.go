@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -12,6 +13,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/ronen25/task2/service"
+	"google.golang.org/grpc"
 )
 
 func httpServerRoutine(serverPort string, doneChannel <-chan os.Signal) {
@@ -43,11 +45,18 @@ func httpServerRoutine(serverPort string, doneChannel <-chan os.Signal) {
 	}
 }
 
-func grpcServerRoutine(serverPort string, doneChannel chan<- bool) {
+func grpcServerRoutine(serverPort string, doneChannel <-chan os.Signal) {
+	bindAddr := fmt.Sprintf(":%s", serverPort)
+	if socket, err := net.Listen("tcp", bindAddr); err != nil {
+		log.Fatalf("Error setting up GRPC endpoint: %v", err)
+	}
+
+	grpcServer := grpc.NewServer()
+	srv := service.QueryPrinterHTTPService
+	svcServer := service.RegisterQueryPrinterGRPCServer(grpcServer, srv)
 }
 
 func main() {
-	const SERVER_COUNT = 1
 	signalChannel := make(chan os.Signal, 1)
 
 	portVars := map[string]string{
