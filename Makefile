@@ -5,12 +5,8 @@ protos:
 	(protoc \
 	    -I . \
 	    -I ${GOPATH}/bin \
-	    --gogofaster_out=plugins=grpc,\
-	Mgoogle/protobuf/timestamp.proto=github.com/gogo/protobuf/types,\
-	Mgoogle/api/annotations.proto=github.com/gogo/googleapis/google/api:. \
-	    --govalidators_out=gogoimport=true,\
-	Mgoogle/protobuf/timestamp.proto=github.com/gogo/protobuf/types,\
-	Mgoogle/api/annotations.proto=github.com/gogo/googleapis/google/api:. \
+	    --go_out=service\
+		--go-grpc_out=service\
 	    service/protos/*.proto)
 
 build: protos

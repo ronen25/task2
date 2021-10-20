@@ -8,6 +8,7 @@ import (
 )
 
 type QueryPrinterGRPCService struct {
+	protos.UnimplementedQueryPrinterGRPCServer
 }
 
 func NewQueryPrinterGRPCService() *QueryPrinterGRPCService {
@@ -17,5 +18,9 @@ func NewQueryPrinterGRPCService() *QueryPrinterGRPCService {
 func (svc *QueryPrinterGRPCService) PrintParameters(ctx context.Context, r *protos.Request) (*protos.Response, error) {
 	// TODO
 	log.Printf("%v", r)
-	return nil, nil
+	return &protos.Response{
+		Param1: "",
+		Param2: "",
+		Param3: "",
+	}, nil
 }

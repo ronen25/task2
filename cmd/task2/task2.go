@@ -15,6 +15,7 @@ import (
 	"github.com/ronen25/task2/service"
 	"github.com/ronen25/task2/service/protos"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 func httpServerRoutine(serverPort string, doneChannel <-chan os.Signal) {
@@ -56,6 +57,7 @@ func grpcServerRoutine(serverPort string, doneChannel <-chan os.Signal) {
 
 	grpcServer := grpc.NewServer()
 	protos.RegisterQueryPrinterGRPCServer(grpcServer, service.NewQueryPrinterGRPCService())
+	reflection.Register(grpcServer)
 	go func() {
 		log.Printf("GRPC listening on address %s", bindAddr)
 		grpcServer.Serve(lis)
