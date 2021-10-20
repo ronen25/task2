@@ -11,7 +11,7 @@ protos:
 	    --govalidators_out=gogoimport=true,\
 	Mgoogle/protobuf/timestamp.proto=github.com/gogo/protobuf/types,\
 	Mgoogle/api/annotations.proto=github.com/gogo/googleapis/google/api:. \
-	    service/grpc/*.proto)
+	    service/protos/*.proto)
 
 build: protos
 	@echo "--- Building application"

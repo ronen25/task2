@@ -13,6 +13,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/ronen25/task2/service"
+	"github.com/ronen25/task2/service/protos"
 	"google.golang.org/grpc"
 )
 
@@ -28,14 +29,15 @@ func httpServerRoutine(serverPort string, doneChannel <-chan os.Signal) {
 	bindAddress := fmt.Sprintf(":%s", serverPort)
 	server := &http.Server{Addr: bindAddress, Handler: router}
 
-	log.Printf("Listening on address %s", bindAddress)
 	go func() {
+		log.Printf("HTTP listening on address %s", bindAddress)
 		if err := server.ListenAndServe(); err != nil {
 			log.Fatalf("Error setting up HTTP server: %v", err)
 		}
 	}()
 
 	<-doneChannel
+	log.Printf("Exiting HTTP server...")
 
 	// Exit handler
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -47,13 +49,23 @@ func httpServerRoutine(serverPort string, doneChannel <-chan os.Signal) {
 
 func grpcServerRoutine(serverPort string, doneChannel <-chan os.Signal) {
 	bindAddr := fmt.Sprintf(":%s", serverPort)
-	if socket, err := net.Listen("tcp", bindAddr); err != nil {
+	lis, err := net.Listen("tcp", bindAddr)
+	if err != nil {
 		log.Fatalf("Error setting up GRPC endpoint: %v", err)
 	}
 
 	grpcServer := grpc.NewServer()
-	srv := service.QueryPrinterHTTPService
-	svcServer := service.RegisterQueryPrinterGRPCServer(grpcServer, srv)
+	protos.RegisterQueryPrinterGRPCServer(grpcServer, service.NewQueryPrinterGRPCService())
+	go func() {
+		log.Printf("GRPC listening on address %s", bindAddr)
+		grpcServer.Serve(lis)
+	}()
+
+	<-doneChannel
+	log.Printf("Exiting GRPC server...")
+
+	// Exit handler
+	grpcServer.GracefulStop()
 }
 
 func main() {
@@ -79,6 +91,7 @@ func main() {
 
 	// Initialize both services - one on HTTP, the other on GRPC
 	go httpServerRoutine(portVars["HTTP_PORT"], signalChannel)
+	go grpcServerRoutine(portVars["GRPC_PORT"], signalChannel)
 
 	// App quits when both servers are done
 	<-signalChannel
