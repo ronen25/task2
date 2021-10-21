@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/ronen25/task2/instrumentation"
 	"github.com/ronen25/task2/service"
 	"github.com/ronen25/task2/service/protos"
 	"google.golang.org/grpc"
@@ -24,6 +25,12 @@ func httpServerRoutine(serverPort string, doneChannel <-chan os.Signal) {
 	// Initialize router
 	router := mux.NewRouter()
 	router.Use(mux.CORSMethodMiddleware(router))
+
+	// Register instrumentation
+	ins := instrumentation.NewInstrumentation()
+	ins.RegisterInstrumentation()
+
+	router.Handle("/metrics", ins.HTTPHandler)
 	router.HandleFunc("/", service.QueryPrintingHandler)
 
 	// Listen on provided HTTP port
