@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/ronen25/task2/instrumentation"
 	"github.com/ronen25/task2/service/protos"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -18,7 +19,26 @@ func NewQueryPrinterGRPCService() *QueryPrinterGRPCService {
 	return &QueryPrinterGRPCService{}
 }
 
+func (service *QueryPrinterGRPCService) updateTotalCounters() {
+	instrumentation.Instrumentation.TotalRequests.Add(1)
+	instrumentation.Instrumentation.TotalRequestsGRPC.Add(1)
+}
+
+func (service *QueryPrinterGRPCService) updateCountersBad() {
+	service.updateTotalCounters()
+
+	instrumentation.Instrumentation.TotalBadRequests.Add(1)
+}
+
+func (service *QueryPrinterGRPCService) updateCountersGood() {
+	service.updateTotalCounters()
+
+	instrumentation.Instrumentation.TotalGoodRequests.Add(1)
+}
+
 func (svc *QueryPrinterGRPCService) PrintParameters(ctx context.Context, r *protos.Request) (*protos.Response, error) {
+	svc.updateTotalCounters()
+
 	// Check for 3 parameters. We expect the query to be similar
 	// to the HTTP format.
 	params := make(map[string]string)
@@ -27,6 +47,8 @@ func (svc *QueryPrinterGRPCService) PrintParameters(ctx context.Context, r *prot
 	if len(values) != 3 {
 		err := status.Error(codes.InvalidArgument,
 			fmt.Sprintf("Expected 3 arguments, got %d", len(values)))
+
+		svc.updateCountersBad()
 		return nil, err
 	}
 
@@ -40,6 +62,8 @@ func (svc *QueryPrinterGRPCService) PrintParameters(ctx context.Context, r *prot
 	for _, v := range params {
 		valueParams = append(valueParams, v)
 	}
+
+	svc.updateCountersGood()
 
 	return &protos.Response{
 		Param1: valueParams[0],

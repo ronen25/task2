@@ -27,10 +27,9 @@ func httpServerRoutine(serverPort string, doneChannel <-chan os.Signal) {
 	router.Use(mux.CORSMethodMiddleware(router))
 
 	// Register instrumentation
-	ins := instrumentation.NewInstrumentation()
-	ins.RegisterInstrumentation()
+	instrumentation.NewInstrumentation()
 
-	router.Handle("/metrics", ins.HTTPHandler)
+	router.Handle("/metrics", instrumentation.Instrumentation.HTTPHandler)
 	router.HandleFunc("/", service.QueryPrintingHandler)
 
 	// Listen on provided HTTP port
